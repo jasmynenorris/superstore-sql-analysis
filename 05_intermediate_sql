@@ -1,0 +1,63 @@
+-- ==========================================================
+-- Intermediate SQL Queries
+-- Superstore SQL Analysis
+-- ==========================================================
+
+-- 1. Categorize products by price using CASE
+
+SELECT
+    item_name,
+    price,
+    CASE
+        WHEN price >= 300 THEN 'Premium'
+        WHEN price >= 100 THEN 'Mid-Range'
+        ELSE 'Budget'
+    END AS price_category
+FROM superstore
+ORDER BY price DESC;
+
+
+-- 2. Rank products from highest to lowest price
+
+SELECT
+    item_name,
+    price,
+    RANK() OVER (ORDER BY price DESC) AS price_rank
+FROM superstore;
+
+
+-- 3. Show products priced above the overall average
+
+SELECT
+    item_name,
+    price
+FROM superstore
+WHERE price >
+(
+    SELECT AVG(price)
+    FROM superstore
+)
+ORDER BY price DESC;
+
+
+-- 4. Display category averages alongside each product
+
+SELECT
+    item_name,
+    category,
+    price,
+    AVG(price) OVER(PARTITION BY category) AS category_average
+FROM superstore;
+
+
+-- 5. Number products within each category by price
+
+SELECT
+    item_name,
+    category,
+    price,
+    ROW_NUMBER() OVER(
+        PARTITION BY category
+        ORDER BY price DESC
+    ) AS category_rank
+FROM superstore;
